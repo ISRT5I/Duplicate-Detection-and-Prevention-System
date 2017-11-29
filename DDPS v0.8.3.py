@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from tkinter import *
-import os, sys, time
-import hashlib
+import os, sys, time, hashlib, threading
 
 #class Scroll(object):
 #
@@ -175,13 +174,24 @@ class Whitelist:
             print (whiteFolder + " has been whitelisted.")
         wFolder.close()
 
-#class Realtime:
-#    
-#    def watchPath():
-#       insert = "here"
-#
-#    def realTimeWatch():
-#        insert = "here"
+class Realtime:
+    
+    def check(folders):
+       Realtime.watch(folders)
+
+    def watch(folders):
+        path_to_watch = folders
+        before = dict ([(f, None) for f in os.listdir (path_to_watch)])
+        while 1:
+          time.sleep (10)
+          after = dict ([(f, None) for f in os.listdir (path_to_watch)])
+          added = [f for f in after if not f in before]
+          removed = [f for f in before if not f in after]
+          if added:
+              print ("Added: " , ", ".join (added))
+          if removed:
+              print ("Removed: ", ", ".join (removed))
+          before = after
 
 #class Options:
 #    def check():
@@ -200,10 +210,11 @@ class Main:
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()
+    folder = filedialog.askdirectory()
+    threading.Thread(target=Realtime.check, args = (folder,)).start()
     result = messagebox.askyesno("DDPS","Would you like to perform a scan?")
     if result == True:
         Hash.memScan()
     else:
         sys.exit()
     Main.main()
-
