@@ -175,9 +175,31 @@ class Whitelist:
         wFolder.close()
 
 class Realtime:
+
+    def start():
+        realFolder = open(os.path.join('lists', "realfolder.txt"),"r")
+        folder = realFolder.read()
+        if folder != "":
+            threading.Thread(target=Realtime.watch, args = (folder,)).start()
+        realFolder.close()
+        print("Must set directory first")
+        
+    def check():
+        real = open(os.path.join('lists', "realtime.txt"),"r")
+        realtime = real.readlines()
+        print (realtime[0])
+        if realtime[0] == "1":
+            print ("realtime scan is set.")
+            Realtime.start()
+        else:
+            print ("realtime scan not set.")
+        real.close()
     
-    def check(folders):
-       Realtime.watch(folders)
+    def set():
+        real = open(os.path.join('lists', "realtime.txt"),"w")
+        real.write("1")
+        Realtime.start()
+        real.close()
 
     def watch(folders):
         path_to_watch = folders
@@ -189,32 +211,32 @@ class Realtime:
           removed = [f for f in before if not f in after]
           if added:
               print ("Added: " , ", ".join (added))
+              
           if removed:
               print ("Removed: ", ", ".join (removed))
           before = after
 
+    def stop():
+        real = open(os.path.join('lists', "realtime.txt"),"w")
+        real.write("0")
+        real.close()
+        print ("Program must restart to disable realtime scan.")
+        
 #class Options:
 #    def check():
 #        nothing = 1
         
-            
 class Main:       
-    def main():
-        result = messagebox.askyesno("DDPS","Would you like to perform another scan?")
+    def menu():
+        result = messagebox.askyesno("DDPS","Would you like to perform a scan?")
         if result == True:
             Hash.memScan()
         else:
             sys.exit()
-        Main.main()
+        Main.menu()
             
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()
-    folder = filedialog.askdirectory()
-    threading.Thread(target=Realtime.check, args = (folder,)).start()
-    result = messagebox.askyesno("DDPS","Would you like to perform a scan?")
-    if result == True:
-        Hash.memScan()
-    else:
-        sys.exit()
-    Main.main()
+    Realtime.check()
+    Main.menu()
