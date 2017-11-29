@@ -4,8 +4,8 @@ from tkinter import *
 import os, sys, time
 import hashlib
 
-class Scroll(object):
-
+#class Scroll(object):
+#
 #    def __init__(self):
 #        self.root = tk.Tk()
 #    # create a Text widget with a Scrollbar attached
