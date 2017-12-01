@@ -48,7 +48,7 @@ class GUI(Frame):
         dupLabel = Label(self, text="Duplicates:", font=("Calibri", 40), bg = "gray45")
         dupLabel.place(x=100, y=250)
 
-        load = PIL.Image.open('DDPS_logo64.png')
+        load = PIL.Image.open('assets\\DDPS_logo64.png')
         render = PIL.ImageTk.PhotoImage(load)
         img = Label(self, image=render)
         img.image = render
@@ -60,6 +60,9 @@ class GUI(Frame):
         s.configure("red.Horizontal.TProgressbar", foreground='red2', background='red2')
         progressBar = ttk.Progressbar(self, length=600, orient='horizontal', mode='indeterminate', style="red.Horizontal.TProgressbar", maximum=50)
         progressBar.place(x=150, y=125)
+        
+        curPathLabel = Label(self, text = " ", font = ("Calibri"), bg = "gray45")
+        curPathLabel.place(x = 150, y = 150)
 
     def progress(state):
         s = ttk.Style()
@@ -71,6 +74,14 @@ class GUI(Frame):
             gui.progressBar.start()
         else:
             gui.progressBar.stop()
+            gui.curPathLabel = Label(gui, text = " ", font = ("Calibri"), bg = "gray45")
+            gui.curPathLabel.place(x = 150, y = 150, width = 600, height = 100)
+            
+    def curPath(path):
+        gui.curPathLabel = Label(gui, text = "Scanning " + path + "...", font = ("Calibri"), bg = "gray60", wraplength=600, justify = "left")
+        gui.curPathLabel.place(x = 150, y = 150, width = 600)
+        gui.curPathLabel.update()
+        
         
 class Hash:
 
@@ -79,6 +90,7 @@ class Hash:
         for dirs, subdirs, fileList in os.walk(parentFolder):
             dirName = dirs.replace("\\", "/")
             print('Scanning %s...' % dirName)
+            GUI.curPath(dirName)
             for filename in fileList:
                 path = dirName + "/" + filename
                 file_hash = Hash.hashfile(path)
@@ -90,7 +102,7 @@ class Hash:
   
     def memDup(parentFolder):
         dups = {}
-        dic = open(os.path.join('lists', "dictionary.txt"),"a+")
+        dic = open("assets\\lists\\dictionary.txt","a+")
         dic.seek(0)
         dicts = [line.split("|") for line in dic]
         wFiles = open(os.path.join('lists', "whitefile.txt"),"a+")
@@ -103,6 +115,7 @@ class Hash:
             dirName = dirs.replace("\\", "/")
             if dirName not in whiteFolder:
                 print('Scanning %s...' % dirName)
+                GUI.curPath(dirName)
                 for filename in fileList:
                     path = dirName + "/" + filename
                     if path not in whiteFiles:
@@ -158,7 +171,7 @@ class Hash:
         GUI.progress(1)
         folder = filedialog.askdirectory()
         GUI.progress(1)
-        wFolder = open(os.path.join('lists', "whitefolder.txt"),"a+")
+        wFolder = open("assets\\lists\\whitefolder.txt","a+")
         wFolder.seek(0)
         whiteFolder = [x.strip() for x in wFolder.readlines()]
         wFolder.close()
@@ -182,7 +195,7 @@ class Hash:
 class Whitelist:
 
     def addFile():
-        wFile = open(os.path.join('lists', "whitefile.txt"),"a+")
+        wFile = open("assets\\lists\\whitefile.txt","a+")
         wFile.seek(0)
         whiteList = [x.strip() for x in wFile.readlines()]
         wFiles = filedialog.askopenfilenames(title='Choose file(s)')
@@ -198,7 +211,7 @@ class Whitelist:
         wFile.close()        
             
     def addFolder():
-        wFolder = open(os.path.join('lists', "whitefolder.txt"),"a+")
+        wFolder = open("assets\\lists\\whitefolder.txt","a+")
         wFolder.seek(0)
         whiteList = [x.strip() for x in wFolder.readlines()]
         whiteFolder = filedialog.askdirectory()
@@ -214,7 +227,7 @@ class Whitelist:
 class Realtime:
 
     def start():
-        realFolder = open(os.path.join('lists', "realfolder.txt"),"r")
+        realFolder = open("assets\\lists\\realfolder.txt","r")
         folder = realFolder.read()
         print (folder)
         if folder != "":
@@ -224,7 +237,9 @@ class Realtime:
         realFolder.close()
         
     def check():
-        real = open(os.path.join('lists', "realtime.txt"),"r")
+        #real = open(os.path.join('lists', "realtime.txt"),"r")
+        #rewrite as open("lists\realtime.txt", "r")
+        real = open("assets\\lists\\realtime.txt", "r")
         realtime = real.readlines()
         print (realtime[0])
         if realtime[0] == "1":
@@ -235,7 +250,7 @@ class Realtime:
         real.close()
     
     def set():
-        real = open(os.path.join('lists', "realtime.txt"),"w")
+        real = open("assets\\lists\\realtime.txt","w")
         real.write("1")
         Realtime.start()
         real.close()
@@ -256,7 +271,7 @@ class Realtime:
           before = after
 
     def stop():
-        real = open(os.path.join('lists', "realtime.txt"),"w")
+        real = open("assets\\lists\\realtime.txt","w")
         real.write("0")
         real.close()
         print ("Program must restart to disable realtime scan.")
