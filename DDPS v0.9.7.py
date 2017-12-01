@@ -24,7 +24,7 @@ class GUI(Frame):
         realButton.place(x=0, y=160)
         listButton = Button(self, text="Whitelist", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Whitelist.opens)
         listButton.place(x=0, y=245)
-        cusButton = Button(self, text="Custom Scan(s)", bg =Theme.sideButton(), fg=Theme.font(), height=5, width=11)
+        cusButton = Button(self, text="Custom Scan(s)", bg =Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Custom.open)
         cusButton.place(x=0, y=330)
         setButton = Button(self, text="Themes", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Theme.open)
         setButton.place(x=0, y=415)     
@@ -434,6 +434,47 @@ class Theme():
 
     def update():
         gui.update()
+            
+class Custom():
+
+    cusDir = [0, 0, 0, 0]
+
+    def open():
+        master = tk.Tk()
+        master.geometry("240x142")
+        master.resizable(False, False)
+        master.configure(background=Theme.backGround())
+        master.title("DDPS")
+        dir1 = Button(master, text="Custom Dir 1", background=Theme.backGround(), height=4, width=10, command = lambda: Custom.setDir(0))
+        dir1.grid(row=0, column=0)
+        dir2 = Button(master, text="Custom Dir 2", background=Theme.backGround(), height=4, width=10, command = lambda: Custom.setDir(1))
+        dir2.grid(row=0, column=1)
+        dir3 = Button(master, text="Custom Dir 3", background=Theme.backGround(), height=4, width=10, command = lambda: Custom.setDir(2))
+        dir3.grid(row=1, column=0)
+        dir4 = Button(master, text="Custom Dir 4", background=Theme.backGround(), height=4, width=10, command = lambda: Custom.setDir(3))
+        dir4.grid(row=1, column=1)
+        b1 = Button(master, text='ok', bg=Theme.sideButton(), fg=Theme.font(), command = lambda: Custom.destroy(master))
+        b1.place(relx=0, x=188, y=95, anchor=NW)
+        
+    def setDir(num):
+        if Custom.cusDir[num] == 0:
+            Custom.cusDir[num] = filedialog.askdirectory()
+            return
+        Custom.cusScan(Custom.cusDir[num])
+        
+    def cusScan(cusFolder):
+        GUI.progress(1)
+        folder = cusFolder
+        dups = {}
+        folders = [folder]
+        for i in folders:
+            if os.path.exists(i):
+                Hash.joinDicts(dups, Hash.findDup(i))
+        Hash.printResults(dups)
+        GUI.endScan(dups)
+        
+    def destroy(self):
+        self.destroy()
             
 if __name__ == "__main__":
     root = tk.Tk()
