@@ -20,67 +20,56 @@ class GUI(Frame):
         self.master = master
         self.init_window()
         self.pack(fill=BOTH, expand=1)
-        self.configure(background='gray45')
+        self.configure(background=Theme.backGround())
 
     def init_window(self):
-        simButton = Button(self, text="Similar Scan", bg = "gray60", height=4, width=11)
+        simButton = Button(self, text="Similar Scan", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
         simButton.place(x=0, y=80)
-
-        dupButton = Button(self, text="Duplicates", bg = "gray60", height=4, width=11)
+        dupButton = Button(self, text="Duplicates", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
         dupButton.place(x=0, y=150)
-
-        realButton = Button(self, text="Real-Time", bg = "gray60", height=4, width=11)
+        realButton = Button(self, text="Real-Time", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
         realButton.place(x=0, y=220)
-
-        listButton = Button(self, text="Whitelist", bg = "gray60", height=4, width=11)
+        listButton = Button(self, text="Whitelist", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
         listButton.place(x=0, y=290)
-
-        cusButton = Button(self, text="Custom Scan(s)", bg = "gray60", height=4, width=11)
+        cusButton = Button(self, text="Custom Scan(s)", bg =Theme.sideButton(), fg=Theme.font(), height=4, width=11)
         cusButton.place(x=0, y=360)
-
-        setButton = Button(self, text="Settings", bg = "gray45", height=4, width=11)
-        setButton.place(x=0, y=430)
-
-        scanButton = Button(self, text="Scan", font=("Calibri"), bg="Red2",
-                                                     fg="white", height=4, width=20, command=Hash.scan)
+        setButton = Button(self, text="Themes", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11, command=Theme.open)
+        setButton.place(x=0, y=430)     
+        scanButton = Button(self, text="Scan", font=("Calibri"), bg=Theme.scanButton(), fg=Theme.font(), height=4, width=20, command=Hash.scan)
         scanButton.place(x=545, y=375)
-
-        dupLabel = Label(self, text="Duplicates:", font=("Calibri", 40), bg = "gray45")
+        dupLabel = Label(self, text="Duplicates:", font=("Calibri", 40), bg = Theme.backGround())
         dupLabel.place(x=100, y=250)
-
         load = PIL.Image.open('assets\\DDPS_logo64.png')
         render = PIL.ImageTk.PhotoImage(load)
         img = Label(self, image=render)
         img.image = render
         img.place(x=5, y=5)
-        img.configure(background='gray45')
-
+        img.configure(background=Theme.backGround())
         s = ttk.Style()
         s.theme_use('classic')
-        s.configure("red.Horizontal.TProgressbar", foreground='red2', background='red2')
-        progressBar = ttk.Progressbar(self, length=600, orient='horizontal', mode='indeterminate', style="red.Horizontal.TProgressbar", maximum=50)
-        progressBar.place(x=150, y=125)
-        
+        s.configure("Horizontal.TProgressbar", foreground=Theme.scanButton(), background=Theme.scanButton())
+        progressBar = ttk.Progressbar(self, length=600, orient='horizontal', mode='indeterminate', style="Horizontal.TProgressbar", maximum=50)
+        progressBar.place(x=150, y=125) 
         #not 100% sure how this works but I am assuming i have to do an initialization of sorts for the label here
-        curPathLabel = Label(self, text = " ", font = ("Calibri"), bg = "gray45")
+        curPathLabel = Label(self, text = " ", font = ("Calibri"), bg = Theme.backGround())
         curPathLabel.place(x = 150, y = 150)
 
     def progress(state):
         s = ttk.Style()
         s.theme_use('classic')
-        s.configure("red.Horizontal.TProgressbar", foreground='red2', background='red2')
-        gui.progressBar = ttk.Progressbar(gui, length=600, orient='horizontal', mode='indeterminate', style="red.Horizontal.TProgressbar", maximum=50)
+        s.configure("Horizontal.TProgressbar", foreground=Theme.scanButton(), background=Theme.scanButton())
+        gui.progressBar = ttk.Progressbar(gui, length=600, orient='horizontal', mode='indeterminate', style="Horizontal.TProgressbar", maximum=50)
         gui.progressBar.place(x=150, y=125)
         if state == 1:
             gui.progressBar.start()
         else:
             gui.progressBar.stop()
-            gui.curPathLabel = Label(gui, text = " ", font = ("Calibri"), bg = "gray45")
+            gui.curPathLabel = Label(gui, text = " ", font = ("Calibri"), bg = Theme.backGround())
             gui.curPathLabel.place(x = 150, y = 150, width = 600, height = 100)
     
     #function to take in a directory and print and update the directory below the progress bar; calling curPath(x) wherever there were print functions with directories
     def curPath(path):
-        gui.curPathLabel = Label(gui, text = "Scanning " + path + "...", font = ("Calibri"), bg = "gray60", wraplength=600, justify = "left")
+        gui.curPathLabel = Label(gui, text = "Scanning " + path + "...", font = ("Calibri"), bg = Theme.backGround(), wraplength=600, justify = "left")
         gui.curPathLabel.place(x = 150, y = 150, width = 600)
         gui.curPathLabel.update()
         
@@ -276,12 +265,90 @@ class Realtime:
         real.close()
         print ("Program must restart to disable realtime scan.")
         
-#class Options:
-#    def check():
-#        nothing = 1
-             
+class Theme():
 
+    def open():
+        master = tk.Tk()
+        master.geometry("240x142")
+        master.resizable(False, False)
+        v = IntVar()
+        theme = open("assets\\lists\\theme.txt","r")
+        themeSet = theme.readlines()
+        theme.close
+        v.set(themeSet)
+        theme1 = Button(master, text="Default", height=4, width=10, command = lambda: Theme.setTheme("1"))
+        theme1.grid(row=0, column=0)
+        theme2 = Button(master, text="Light", height=4, width=10, command = lambda: Theme.setTheme("2"))
+        theme2.grid(row=0, column=1)
+        theme3 = Button(master, text="Dark", height=4, width=10,command = lambda: Theme.setTheme("3"))
+        theme3.grid(row=1, column=0)
+        theme4 = Button(master, text="DarkRed", height=4, width=10, command = lambda: Theme.setTheme("4"))
+        theme4.grid(row=1, column=1)
+        theme5 = Button(master, text="Contrast", height=4, width=10, command = lambda: Theme.setTheme("5"))
+        theme5.grid(row=0, column=2)
+        b1 = Button(master, text='ok', bg="gray97", command = master.destroy)
+        b1.place(relx=0, x=188, y=95, anchor=NW)
 
+    def setTheme(choice):
+        theme = open("assets\\lists\\theme.txt","w")
+        theme.write(choice)
+        print(choice)
+        theme.close()
+        
+    def sideButton():
+        theme = open("assets\\lists\\theme.txt","r")
+        themeSet = theme.read()
+        print (themeSet)
+        if themeSet == "1":
+            return "gray80"
+        if themeSet == '2':
+            return "white"
+        if themeSet == "3":
+            return "gray40"
+        if themeSet == "4":
+            return "gray40"
+        if themeSet == "5":
+            return "black"
+        theme.close()
+
+    def scanButton():
+        theme = open("assets\\lists\\theme.txt","r")
+        themeSet = theme.read()
+        if themeSet == "1":
+            return "blue"
+        if themeSet == '2':
+            return "cyan"
+        if themeSet == "3":
+            return "medium blue"
+        if themeSet == "4":
+            return "red2"
+        if themeSet == "5":
+            return "black"
+        theme.close()
+
+    def backGround():
+        theme = open("assets\\lists\\theme.txt","r")
+        themeSet = theme.read()
+        if themeSet == "1":
+            return "gray90"
+        if themeSet == '2':
+            return "white"
+        if themeSet == "3":
+            return "gray45"
+        if themeSet == "4":
+            return "gray45"
+        if themeSet == "5":
+            return "white"
+        theme.close()
+
+    def font():
+        theme = open("assets\\lists\\theme.txt","r")
+        themeSet = theme.read()
+        if themeSet < "3":
+            return "black"
+        else:
+            return "white"
+        theme.close()
             
 if __name__ == "__main__":
     root = tk.Tk()
