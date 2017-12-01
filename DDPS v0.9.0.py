@@ -61,6 +61,7 @@ class GUI(Frame):
         progressBar = ttk.Progressbar(self, length=600, orient='horizontal', mode='indeterminate', style="red.Horizontal.TProgressbar", maximum=50)
         progressBar.place(x=150, y=125)
         
+        #not 100% sure how this works but I am assuming i have to do an initialization of sorts for the label here
         curPathLabel = Label(self, text = " ", font = ("Calibri"), bg = "gray45")
         curPathLabel.place(x = 150, y = 150)
 
@@ -76,7 +77,8 @@ class GUI(Frame):
             gui.progressBar.stop()
             gui.curPathLabel = Label(gui, text = " ", font = ("Calibri"), bg = "gray45")
             gui.curPathLabel.place(x = 150, y = 150, width = 600, height = 100)
-            
+    
+    #function to take in a directory and print and update the directory below the progress bar; calling curPath(x) wherever there were print functions with directories
     def curPath(path):
         gui.curPathLabel = Label(gui, text = "Scanning " + path + "...", font = ("Calibri"), bg = "gray60", wraplength=600, justify = "left")
         gui.curPathLabel.place(x = 150, y = 150, width = 600)
@@ -237,8 +239,6 @@ class Realtime:
         realFolder.close()
         
     def check():
-        #real = open(os.path.join('lists', "realtime.txt"),"r")
-        #rewrite as open("lists\realtime.txt", "r")
         real = open("assets\\lists\\realtime.txt", "r")
         realtime = real.readlines()
         print (realtime[0])
