@@ -4,15 +4,6 @@ from tkinter import filedialog, messagebox, ttk
 from tkinter import *
 import os, sys, time ,hashlib ,threading
 
-#class Scroll(object):
-#
-#    def __init__(self):
-#        self.root = tk.Tk()
-#    # create a Text widget with a Scrollbar attached
-#        self.txt = ScrolledText(self.root, undo=True)
-#        self.txt['font'] = ('consolas', '12')
-#        self.txt.pack(expand=True, fill='both')
-
 class GUI(Frame):
 
     def __init__(self, master=None):
@@ -23,18 +14,16 @@ class GUI(Frame):
         self.configure(background=Theme.backGround())
 
     def init_window(self):
-        simButton = Button(self, text="Similar Scan", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
-        simButton.place(x=0, y=80)
-        dupButton = Button(self, text="Duplicates", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
-        dupButton.place(x=0, y=150)
-        realButton = Button(self, text="Real-Time", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
-        realButton.place(x=0, y=220)
-        listButton = Button(self, text="Whitelist", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11)
-        listButton.place(x=0, y=290)
-        cusButton = Button(self, text="Custom Scan(s)", bg =Theme.sideButton(), fg=Theme.font(), height=4, width=11)
-        cusButton.place(x=0, y=360)
-        setButton = Button(self, text="Themes", bg = Theme.sideButton(), fg=Theme.font(), height=4, width=11, command=Theme.open)
-        setButton.place(x=0, y=430)     
+        dupButton = Button(self, text="Duplicates", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11)
+        dupButton.place(x=0, y=75)
+        realButton = Button(self, text="RealTime", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Realtime.opens)
+        realButton.place(x=0, y=160)
+        listButton = Button(self, text="Whitelist", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Whitelist.opens)
+        listButton.place(x=0, y=245)
+        cusButton = Button(self, text="Custom Scan(s)", bg =Theme.sideButton(), fg=Theme.font(), height=5, width=11)
+        cusButton.place(x=0, y=330)
+        setButton = Button(self, text="Themes", bg = Theme.sideButton(), fg=Theme.font(), height=5, width=11, command=Theme.open)
+        setButton.place(x=0, y=415)     
         scanButton = Button(self, text="Scan", font=("Calibri"), bg=Theme.scanButton(), fg=Theme.font(), height=4, width=20, command=Hash.scan)
         scanButton.place(x=545, y=375)
         dupLabel = Label(self, text="Duplicates:", font=("Calibri", 40), bg = Theme.backGround())
@@ -72,6 +61,17 @@ class GUI(Frame):
         gui.curPathLabel = Label(gui, text = "Scanning " + path + "...", font = ("Calibri"), bg = Theme.backGround(), wraplength=600, justify = "left")
         gui.curPathLabel.place(x = 150, y = 150, width = 600)
         gui.curPathLabel.update()
+
+    def realTime():
+        isTime = open("assets\\lists\\realtime.txt","r")
+        realtime = isTime.read()
+        if realtime == "1":
+            status = "is"
+        else:
+            status = "is not"
+        gui.realStatus = Label(gui, text="RealTime Scan " + status + " set.", font="Calibri", bg = Theme.backGround())
+        gui.realStatus.place(x=100,y=450)
+        gui.realStatus.update()
         
         
 class Hash:
@@ -185,6 +185,35 @@ class Hash:
 
 class Whitelist:
 
+    def opens():
+        white = tk.Tk()
+        white.geometry("1000x450")
+        white.resizable(False, False)
+        white.configure(background=Theme.backGround())
+        white.title("DDPS")
+        def update():
+            wFolder = open("assets\\lists\\whitefolder.txt","r")
+            folders = wFolder.read()
+            wFolder.close()
+            label = Label(white, text = folders, wraplength=450, bg=Theme.backGround(), justify="left")
+            label.place(x=0, y=25, width=500)
+            wFile = open("assets\\lists\\whitefile.txt","r")
+            files = wFile.read()
+            wFile.close()
+            label = Label(white, text = files, wraplength=450, bg=Theme.backGround(), justify="left")
+            label.place(x=500, y=25, width=500)
+        update()
+        white.whiteFolderLabel = Label(white, text = "Whitelisted Folders", font = ("Calibri"), bg = Theme.backGround(), wraplength=600, justify = "left")
+        white.whiteFolderLabel.place(x = 175, y = 0)
+        white.whiteFileLabel = Label(white, text = "Whitelisted Files", font = ("Calibri"), bg = Theme.backGround(), wraplength=600, justify = "left")
+        white.whiteFileLabel.place(x = 700, y = 0 )
+        white.addFolders = Button(white, text = "Add Directories...", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command=lambda: [f() for f in [Whitelist.addFolder, update]])
+        white.addFolders.place(x = 175, y = 400 )
+        white.addFolders = Button(white, text = "Add Files...", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command=lambda: [f() for f in [Whitelist.addFile, update]])
+        white.addFolders.place(x = 700, y = 400 )
+        white.addFolders = Button(white, text = "Done", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command = white.destroy)
+        white.addFolders.place(x = 925, y = 400 )     
+        
     def addFile():
         wFile = open("assets\\lists\\whitefile.txt","a+")
         wFile.seek(0)
@@ -192,13 +221,12 @@ class Whitelist:
         wFiles = filedialog.askopenfilenames(title='Choose file(s)')
         whiteFiles = list(wFiles)
         if not whiteFiles:
-                print ("No files whitelisted.")
+                messagebox.showinfo("DDPS","No files whitelisted.")
         for whiteFile in whiteFiles:
             if whiteFile in whiteList:
-                print (whiteFile + " is already whitelisted!")
+                messagebox.showinfo("DDPS",whiteFile + " is already whitelisted!")
             else:
                 wFile.write(whiteFile + "\n")
-                print (whiteFile + " has been whitelisted.")
         wFile.close()        
             
     def addFolder():
@@ -207,16 +235,49 @@ class Whitelist:
         whiteList = [x.strip() for x in wFolder.readlines()]
         whiteFolder = filedialog.askdirectory()
         if whiteFolder == "":
-            print ("No folders whitelisted.")
+            messagebox.showinfo("DDPS","No folders whitelisted.")
         elif whiteFolder in whiteList:
-            print (whiteFolder + " is already whitelisted!")
+            messagebox.showinfo("DDPS",whiteFolder + " is already whitelisted!")
         else:
             wFolder.write(whiteFolder + "\n")
-            print (whiteFolder + " has been whitelisted.")
         wFolder.close()
 
 class Realtime:
+    
+    def opens():
+        real = tk.Tk()
+        real.geometry("525x250")
+        real.resizable(False, False)
+        real.configure(background=Theme.backGround())
+        real.title("DDPS")
+        def update():
+            realtime = open("assets\\lists\\realtime.txt","r")
+            rtime = realtime.read()
+            realtime.close()
+            realFolder = open("assets\\lists\\realfolder.txt","r")
+            rfolder = realFolder.read()
+            realFolder.close()
+            if rtime == "0":
+                label = Label(real, text = "RealTime scan not set.\n\nDirectory set:\n" + rfolder, wraplength=450, bg=Theme.backGround(), justify="left")
+                label.place(x=0, y=25, width=500)
+            else:
+                label = Label(real, text="RealTime scan is set.\n\nDirectory set:\n" + rfolder, wraplength=450, bg=Theme.backGround(), justify="left")
+                label.place(x=0, y=25, width=500)
+        update()
+        real.setDirectory = Button(real, text = "Set Directory...", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command=lambda: [f() for f in [Realtime.setDirectory, update]])
+        real.setDirectory.place(x = 195, y = 165 )
+        real.start = Button(real, text = "Start", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command=lambda: [f() for f in [Realtime.set, update, GUI.realTime]])
+        real.start.place(x = 200, y = 200 )
+        real.stop = Button(real, text = "Stop", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command=lambda: [f() for f in [Realtime.stop, update, GUI.realTime]])
+        real.stop.place(x = 250, y = 200 )
+        real.done = Button(real, text = "Done", font = ("Calibri"), bg = Theme.sideButton(), fg=Theme.font(), command = real.destroy)
+        real.done.place(x = 450, y = 200 )
 
+    def setDirectory():
+        folder = filedialog.askdirectory()
+        realFolder = open("assets\\lists\\realfolder.txt","w")
+        realFolder.write(folder)
+        
     def start():
         realFolder = open("assets\\lists\\realfolder.txt","r")
         folder = realFolder.read()
@@ -229,9 +290,9 @@ class Realtime:
         
     def check():
         real = open("assets\\lists\\realtime.txt", "r")
-        realtime = real.readlines()
-        print (realtime[0])
-        if realtime[0] == "1":
+        realtime = real.read()
+        print (realtime)
+        if realtime == "1":
             print ("realtime scan is set.")
             Realtime.start()
         else:
@@ -263,7 +324,7 @@ class Realtime:
         real = open("assets\\lists\\realtime.txt","w")
         real.write("0")
         real.close()
-        print ("Program must restart to disable realtime scan.")
+        messagebox.showinfo("DDPS","Program must restart to disable realtime scan.")
         
 class Theme():
 
@@ -271,6 +332,8 @@ class Theme():
         master = tk.Tk()
         master.geometry("240x142")
         master.resizable(False, False)
+        master.configure(background=Theme.backGround())
+        master.title("DDPS")
         v = IntVar()
         theme = open("assets\\lists\\theme.txt","r")
         themeSet = theme.readlines()
@@ -278,16 +341,20 @@ class Theme():
         v.set(themeSet)
         theme1 = Button(master, text="Default", height=4, width=10, command = lambda: Theme.setTheme("1"))
         theme1.grid(row=0, column=0)
-        theme2 = Button(master, text="Light", height=4, width=10, command = lambda: Theme.setTheme("2"))
+        theme2 = Button(master, text="Light", bg="cyan", height=4, width=10, command = lambda: Theme.setTheme("2"))
         theme2.grid(row=0, column=1)
-        theme3 = Button(master, text="Dark", height=4, width=10,command = lambda: Theme.setTheme("3"))
+        theme3 = Button(master, text="Dark", bg="gray40", fg="medium blue",  height=4, width=10,command = lambda: Theme.setTheme("3"))
         theme3.grid(row=1, column=0)
-        theme4 = Button(master, text="DarkRed", height=4, width=10, command = lambda: Theme.setTheme("4"))
+        theme4 = Button(master, text="DarkRed",bg= "gray40", fg="red2",  height=4, width=10, command = lambda: Theme.setTheme("4"))
         theme4.grid(row=1, column=1)
-        theme5 = Button(master, text="Contrast", height=4, width=10, command = lambda: Theme.setTheme("5"))
+        theme5 = Button(master, text="Contrast",bg="black", fg="white",  height=4, width=10, command = lambda: Theme.setTheme("5"))
         theme5.grid(row=0, column=2)
-        b1 = Button(master, text='ok', bg="gray97", command = master.destroy)
+        b1 = Button(master, text='ok', bg=Theme.sideButton(), fg=Theme.font(), command = lambda: [f() for f in [Theme.update, Theme.destroy(master)]])
         b1.place(relx=0, x=188, y=95, anchor=NW)
+
+    def destroy(self):
+        messagebox.showinfo("DDPS","Program must restart to correctly update GUI.")
+        self.destroy()
 
     def setTheme(choice):
         theme = open("assets\\lists\\theme.txt","w")
@@ -298,47 +365,31 @@ class Theme():
     def sideButton():
         theme = open("assets\\lists\\theme.txt","r")
         themeSet = theme.read()
-        print (themeSet)
-        if themeSet == "1":
-            return "gray80"
-        if themeSet == '2':
-            return "white"
-        if themeSet == "3":
-            return "gray40"
-        if themeSet == "4":
-            return "gray40"
-        if themeSet == "5":
-            return "black"
+        if themeSet == "1": return "gray80"
+        if themeSet == '2': return "azure"
+        if themeSet == "3": return "gray40"
+        if themeSet == "4": return "gray40"
+        if themeSet == "5": return "black"
         theme.close()
 
     def scanButton():
         theme = open("assets\\lists\\theme.txt","r")
         themeSet = theme.read()
-        if themeSet == "1":
-            return "blue"
-        if themeSet == '2':
-            return "cyan"
-        if themeSet == "3":
-            return "medium blue"
-        if themeSet == "4":
-            return "red2"
-        if themeSet == "5":
-            return "black"
+        if themeSet == "1": return "blue"
+        if themeSet == '2': return "cyan"
+        if themeSet == "3": return "medium blue"
+        if themeSet == "4": return "red2"
+        if themeSet == "5": return "black"
         theme.close()
 
     def backGround():
         theme = open("assets\\lists\\theme.txt","r")
         themeSet = theme.read()
-        if themeSet == "1":
-            return "gray90"
-        if themeSet == '2':
-            return "white"
-        if themeSet == "3":
-            return "gray45"
-        if themeSet == "4":
-            return "gray45"
-        if themeSet == "5":
-            return "white"
+        if themeSet == "1": return "gray90"
+        if themeSet == '2': return "mint cream"
+        if themeSet == "3": return "gray45"
+        if themeSet == "4": return "gray45"
+        if themeSet == "5": return "white"
         theme.close()
 
     def font():
@@ -349,6 +400,9 @@ class Theme():
         else:
             return "white"
         theme.close()
+
+    def update():
+        gui.update()
             
 if __name__ == "__main__":
     root = tk.Tk()
@@ -359,4 +413,5 @@ if __name__ == "__main__":
     gui.title("Duplicate Detection and Prevention System")
     gui.geometry("800x500")
     gui.resizable(False, False)
+    GUI.realTime()
     gui.mainloop()
