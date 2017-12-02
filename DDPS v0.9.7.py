@@ -73,7 +73,7 @@ class GUI(Frame):
             status = "is"
         else:
             status = "is not"
-        gui.realStatus = Label(gui, text="RealTime Scan " + status + " set.", font="Calibri", bg = Theme.backGround())
+        gui.realStatus = Label(gui, text="RealTime Scan " + status + " set.      ", font="Calibri", bg = Theme.backGround())
         gui.realStatus.place(x=100,y=450)
         gui.realStatus.update()
         
@@ -332,11 +332,30 @@ class Realtime:
           added = [f for f in after if not f in before]
           removed = [f for f in before if not f in after]
           if added:
-              print ("Added: " , ", ".join (added))
-              
+              files = []
+              addedHash = []
+              for file in added:
+                  files.append([path_to_watch + "/" + file])
+                  addedHash.append([Hash.hashfile(path_to_watch + "/" + file)])
+              Realtime.newFile(addedHash, files)
           if removed:
               print ("Removed: ", ", ".join (removed))
           before = after
+
+    def newFile(hashFile, paths):
+        dups = []
+        dic = open("assets\\lists\\dictionary.txt","a+")
+        dic.seek(0)
+        dicts = [line.split("|") for line in dic]
+        for Hash in hashFile:
+            for path in paths:
+                if Hash in dicts:
+                    dups.append([paths])
+                    messagebox.showinfo("DDPS","Duplicate added in realtime folder!")
+                else:
+                    dic.append(hashFile + "|" + path + "|")
+            dic.close()
+        
 
     def stop():
         real = open("assets\\lists\\realtime.txt","w")
